@@ -1,0 +1,2 @@
+# tradesta-journal
+Zhurnal
