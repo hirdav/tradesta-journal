@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeSta: Sniper Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics-compat.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-mono">
+
+    <div id="loginScreen" class="fixed inset-0 bg-black z-50 flex items-center justify-center">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700 w-full max-w-md">
+            <h1 class="text-3xl font-bold text-center text-green-500 mb-6 tracking-widest">TRADESTA</h1>
+            <p class="text-center text-gray-400 mb-6 text-sm">SECURE ACCESS REQUIRED</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">OPERATOR ID</label>
+                    <input type="text" id="loginId" class="w-full bg-gray-900 text-white p-3 rounded border border-gray-600 focus:border-green-500 focus:outline-none" placeholder="Enter ID">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500 mb-1">PASSWORD</label>
+                    <input type="password" id="loginPass" class="w-full bg-gray-900 text-white p-3 rounded border border-gray-600 focus:border-green-500 focus:outline-none" placeholder="Enter Password">
+                </div>
+                
+                <p id="loginError" class="text-red-500 text-xs text-center h-4"></p>
+
+                <button type="submit" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded transition duration-200">
+                    AUTHENTICATE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="manifestoModal" class="hidden fixed inset-0 bg-black/95 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-900 border-2 border-red-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[0_0_50px_rgba(220,38,38,0.3)]">
+            <div class="p-6 md:p-8">
+                <div class="flex justify-between items-start mb-6 border-b border-gray-800 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-red-500 tracking-widest uppercase">The Arena Manifesto</h2>
+                    <button onclick="toggleManifesto()" class="text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+                </div>
+                
+                <div class="space-y-6 text-gray-300 leading-relaxed">
+                    <p class="italic text-lg text-white border-l-4 border-red-500 pl-4">
+                        "I enter this market not to gamble, but to hunt. The market is a machine designed to transfer money from the impatient to the patient. Today, I choose to be the patient."
+                    </p>
+
+                    <div>
+                        <h3 class="text-yellow-500 font-bold text-lg mb-1">1. MY AMMO IS SCARCE ($100)</h3>
+                        <p>I do not have infinite lives. I have <strong>two bullets ($50 each)</strong>. If I fire blindly, I die. I will not spray and pray. I will wait for the perfect shot. Cash is a position.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-yellow-500 font-bold text-lg mb-1">2. MY WEAPON IS DANGEROUS (50x Leverage)</h3>
+                        <p>This leverage can build my empire or sever my hand. I respect it. I acknowledge that a <strong>1.5% move against me is death</strong>. I will never enter a trade without knowing exactly where I will die (Stop Loss).</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-yellow-500 font-bold text-lg mb-1">3. MY ENEMY IS THE FEE</h3>
+                        <p>The exchange wants me to churn. I will not feed the beast. <strong>I WILL NOT PAY FOR LIQUIDITY.</strong> I use Limit Orders only. If price leaves without me, let it go. Chasing is for losers.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-yellow-500 font-bold text-lg mb-1">4. MY TRIGGER IS DISCIPLINE</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-400">
+                            <li><strong>No FOMO:</strong> I don't care about green candles, only my plan.</li>
+                            <li><strong>No Revenge:</strong> If I lose, I walk away for 10 mins.</li>
+                            <li><strong>One Shot:</strong> 1-2 high quality trades > 10 mediocre ones.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-red-900/20 p-4 rounded border border-red-900/50">
+                        <h3 class="text-red-500 font-bold text-lg mb-2">5. THE PLEDGE</h3>
+                        <p class="text-sm font-semibold">
+                            If I catch myself entering a Market Order... I will close the terminal.<br>
+                            If I catch myself moving a Stop Loss... I will close the terminal.<br>
+                            If I catch myself trading out of boredom... I will close the terminal.
+                        </p>
+                        <p class="mt-4 text-center font-bold text-white tracking-widest">LET THE GAMES BEGIN.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <button onclick="toggleManifesto()" class="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg">
+                        I UNDERSTAND
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appContent" class="hidden container mx-auto p-4 max-w-3xl">
+        
+        <header class="mb-8 flex flex-col md:flex-row justify-between items-center border-b border-gray-700 pb-4 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-green-500 tracking-wider">TRADESTA</h1>
+                <p class="text-sm text-gray-400 mt-1">"I do not donate my edge to the exchange."</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="toggleManifesto()" class="bg-red-900/50 hover:bg-red-800 text-red-300 border border-red-700 px-4 py-2 rounded text-sm font-bold animate-pulse transition">
+                    ⚠️ ReadMEEE
+                </button>
+                <button onclick="handleLogout()" class="text-xs text-gray-400 border border-gray-700 p-2 rounded hover:bg-gray-800 transition">
+                    LOGOUT
+                </button>
+            </div>
+        </header>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <h2 class="text-xl font-bold mb-4 text-yellow-400">⚠️ PRE-FIRE CHECKLIST</h2>
+            <div id="checklistForm" class="space-y-3">
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
+                    <input type="checkbox" id="habit1" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
+                    <span>I am using a <strong>LIMIT ORDER</strong> (Maker).</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
+                    <input type="checkbox" id="habit2" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
+                    <span>My Stop Loss is defined & set <strong>IMMEDIATELY</strong>.</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
+                    <input type="checkbox" id="habit3" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
+                    <span>I am risking < 2% of my account (The 2-Bullet Rule).</span>
+                </label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
+                    <input type="checkbox" id="habit4" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
+                    <span>I am calm (Not chasing / Not revenge trading).</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <h2 class="text-xl font-bold mb-4 text-blue-400">📝 LOG THE TRADE</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Pair</label>
+                    <input type="text" id="pair" placeholder="e.g. BTCUSD" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 uppercase">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Direction</label>
+                    <select id="direction" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
+                        <option value="Long">LONG (Buy)</option>
+                        <option value="Short">SHORT (Sell)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Entry Price ($)</label>
+                    <input type="number" step="any" id="entryPrice" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Outcome P&L ($)</label>
+                    <input type="number" step="any" id="pnl" placeholder="Leave empty if open" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm text-gray-400 mb-1">Notes</label>
+                <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600" placeholder="Emotional state..."></textarea>
+            </div>
+            <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition">COMMIT</button>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
+            <h2 class="text-xl font-bold mb-4 text-gray-300">📚 HISTORY</h2>
+            <div id="logContainer" class="space-y-4">
+                <p class="text-gray-500 text-center">Waiting for data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZ2MFZvrw2RJhnO5wfw_gUnHCQyqjeyF4",
+            authDomain: "tradesta-9ce50.firebaseapp.com",
+            projectId: "tradesta-9ce50",
+            storageBucket: "tradesta-9ce50.firebasestorage.app",
+            messagingSenderId: "333812531676",
+            appId: "1:333812531676:web:f6fd045c96ba3a47670f19",
+            measurementId: "G-QM2KKPCQWE"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // --- AUTH & UI LOGIC ---
+
+        function toggleManifesto() {
+            const modal = document.getElementById('manifestoModal');
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appContent').classList.remove('hidden');
+                loadTrades();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('appContent').classList.add('hidden');
+            }
+        });
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('loginId').value;
+            const pass = document.getElementById('loginPass').value;
+            const errorText = document.getElementById('loginError');
+
+            if (id === "D_8op!%") {
+                const email = "admin@tradesta.com"; 
+                auth.signInWithEmailAndPassword(email, pass)
+                    .then(() => errorText.innerText = "")
+                    .catch((error) => errorText.innerText = "ACCESS DENIED");
+            } else {
+                errorText.innerText = "INVALID OPERATOR ID";
+            }
+        }
+
+        function handleLogout() {
+            auth.signOut();
+        }
+
+        // --- APP LOGIC ---
+
+        function saveTrade() {
+            const habits = {
+                limitOrder: document.getElementById('habit1').checked,
+                stopLoss: document.getElementById('habit2').checked,
+                riskMgmt: document.getElementById('habit3').checked,
+                calmState: document.getElementById('habit4').checked
+            };
+
+            const pairInput = document.getElementById('pair').value.toUpperCase();
+            
+            const tradeData = {
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                pair: pairInput,
+                direction: document.getElementById('direction').value,
+                entryPrice: parseFloat(document.getElementById('entryPrice').value),
+                pnl: parseFloat(document.getElementById('pnl').value) || 0,
+                notes: document.getElementById('notes').value,
+                habits: habits,
+                uid: auth.currentUser.uid 
+            };
+
+            if (!tradeData.pair || !tradeData.entryPrice) {
+                alert("Fill in Pair and Price.");
+                return;
+            }
+
+            db.collection("trades").add(tradeData)
+            .then(() => {
+                document.getElementById('pair').value = '';
+                document.getElementById('entryPrice').value = '';
+                document.getElementById('pnl').value = '';
+                document.getElementById('notes').value = '';
+                document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
+                alert("Trade Logged Securely.");
+                loadTrades();
+            })
+            .catch((error) => alert("Write Failed: " + error.message));
+        }
+
+        function loadTrades() {
+            const container = document.getElementById('logContainer');
+            
+            db.collection("trades").orderBy("timestamp", "desc").limit(20).get().then((querySnapshot) => {
+                container.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-500 text-center">No trades found.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : '...';
+                    const pnlClass = data.pnl > 0 ? 'text-green-400' : (data.pnl < 0 ? 'text-red-400' : 'text-gray-400');
+                    const allHabitsMet = data.habits && data.habits.limitOrder && data.habits.stopLoss && data.habits.riskMgmt && data.habits.calmState;
+                    const habitBadge = allHabitsMet 
+                        ? '<span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded border border-green-700">DISCIPLINED</span>'
+                        : '<span class="text-xs bg-red-900 text-red-300 px-2 py-1 rounded border border-red-700">UNDISCIPLINED</span>';
+
+                    const html = `
+                        <div class="border-b border-gray-700 pb-3 last:border-0 hover:bg-gray-800 transition p-2 rounded">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="font-bold text-lg text-white">${data.pair}</span> 
+                                    <span class="text-sm text-gray-400 ml-2 font-semibold">${data.direction}</span>
+                                    <div class="text-xs text-gray-500 mt-1">${date}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="font-bold text-xl ${pnlClass}">$${data.pnl}</div>
+                                    <div class="mt-2">${habitBadge}</div>
+                                </div>
+                            </div>
+                            <div class="text-gray-400 text-sm mt-2 italic bg-gray-900 p-2 rounded border border-gray-800">
+                                "${data.notes || ''}"
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+            }).catch(err => console.log("Read Error:", err));
+        }
+    </script>
+</body>
+</html>
