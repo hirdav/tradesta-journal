@@ -49,22 +49,18 @@
                     <p class="italic text-lg text-white border-l-4 border-red-500 pl-4">
                         "I enter this market not to gamble, but to hunt. The market is a machine designed to transfer money from the impatient to the patient. Today, I choose to be the patient."
                     </p>
-
                     <div>
                         <h3 class="text-yellow-500 font-bold text-lg mb-1">1. MY AMMO IS SCARCE ($100)</h3>
                         <p>I do not have infinite lives. I have <strong>two bullets ($50 each)</strong>. If I fire blindly, I die. I will not spray and pray. I will wait for the perfect shot. Cash is a position.</p>
                     </div>
-
                     <div>
                         <h3 class="text-yellow-500 font-bold text-lg mb-1">2. MY WEAPON IS DANGEROUS (50x Leverage)</h3>
                         <p>This leverage can build my empire or sever my hand. I respect it. I acknowledge that a <strong>1.5% move against me is death</strong>. I will never enter a trade without knowing exactly where I will die (Stop Loss).</p>
                     </div>
-
                     <div>
                         <h3 class="text-yellow-500 font-bold text-lg mb-1">3. MY ENEMY IS THE FEE</h3>
                         <p>The exchange wants me to churn. I will not feed the beast. <strong>I WILL NOT PAY FOR LIQUIDITY.</strong> I use Limit Orders only. If price leaves without me, let it go. Chasing is for losers.</p>
                     </div>
-
                     <div>
                         <h3 class="text-yellow-500 font-bold text-lg mb-1">4. MY TRIGGER IS DISCIPLINE</h3>
                         <ul class="list-disc list-inside space-y-1 text-sm text-gray-400">
@@ -73,7 +69,6 @@
                             <li><strong>One Shot:</strong> 1-2 high quality trades > 10 mediocre ones.</li>
                         </ul>
                     </div>
-
                     <div class="bg-red-900/20 p-4 rounded border border-red-900/50">
                         <h3 class="text-red-500 font-bold text-lg mb-2">5. THE PLEDGE</h3>
                         <p class="text-sm font-semibold">
@@ -84,11 +79,30 @@
                         <p class="mt-4 text-center font-bold text-white tracking-widest">LET THE GAMES BEGIN.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="mt-8 text-center">
-                    <button onclick="toggleManifesto()" class="bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full transition shadow-lg">
-                        I UNDERSTAND
+    <div id="diaryModal" class="hidden fixed inset-0 bg-black/95 z-40 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-900 border-2 border-blue-900 rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-[0_0_50px_rgba(30,58,138,0.3)]">
+            <div class="p-6 md:p-8 flex flex-col h-full">
+                <div class="flex justify-between items-start mb-4 border-b border-gray-800 pb-4">
+                    <h2 class="text-2xl font-bold text-blue-400 tracking-widest uppercase">Trader's Mind</h2>
+                    <button onclick="toggleDiary()" class="text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
+                </div>
+                
+                <div class="mb-4">
+                    <textarea id="diaryInput" rows="4" class="w-full bg-gray-800 text-white p-4 rounded border border-gray-700 focus:border-blue-500 focus:outline-none placeholder-gray-500" placeholder="Empty your mind. What are you thinking? What are you feeling? Write it down to let it go."></textarea>
+                    <button onclick="saveDiary()" class="mt-2 w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
+                        SAVE THOUGHT
                     </button>
+                </div>
+
+                <div class="flex-grow overflow-y-auto pr-2">
+                    <h3 class="text-sm text-gray-500 mb-2 uppercase tracking-wide">Previous Thoughts</h3>
+                    <div id="diaryContainer" class="space-y-3">
+                        <p class="text-gray-600 text-center text-sm">Loading thoughts...</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -102,7 +116,10 @@
                 <p class="text-sm text-gray-400 mt-1">"I do not donate my edge to the exchange."</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="toggleManifesto()" class="bg-red-900/50 hover:bg-red-800 text-red-300 border border-red-700 px-4 py-2 rounded text-sm font-bold animate-pulse transition">
+                <button onclick="toggleDiary()" class="bg-blue-900/30 hover:bg-blue-800 text-blue-300 border border-blue-800 px-4 py-2 rounded text-sm font-bold transition flex items-center gap-2">
+                    🧠 Diary
+                </button>
+                <button onclick="toggleManifesto()" class="bg-red-900/30 hover:bg-red-800 text-red-300 border border-red-800 px-4 py-2 rounded text-sm font-bold animate-pulse transition">
                     ⚠️ ReadMEEE
                 </button>
                 <button onclick="handleLogout()" class="text-xs text-gray-400 border border-gray-700 p-2 rounded hover:bg-gray-800 transition">
@@ -158,9 +175,9 @@
             </div>
             <div class="mb-4">
                 <label class="block text-sm text-gray-400 mb-1">Notes</label>
-                <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600" placeholder="Emotional state..."></textarea>
+                <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600" placeholder="Strategy details..."></textarea>
             </div>
-            <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition">COMMIT</button>
+            <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition transform hover:scale-[1.01]">COMMIT</button>
         </div>
 
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
@@ -191,10 +208,15 @@
 
         function toggleManifesto() {
             const modal = document.getElementById('manifestoModal');
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
+            modal.classList.toggle('hidden');
+        }
+
+        function toggleDiary() {
+            const modal = document.getElementById('diaryModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                loadDiary(); // Load thoughts when opened
+                document.getElementById('diaryInput').focus();
             }
         }
         
@@ -229,7 +251,47 @@
             auth.signOut();
         }
 
-        // --- APP LOGIC ---
+        // --- DIARY LOGIC ---
+        function saveDiary() {
+            const content = document.getElementById('diaryInput').value;
+            if (!content.trim()) return;
+
+            db.collection("diary_entries").add({
+                content: content,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                uid: auth.currentUser.uid
+            })
+            .then(() => {
+                document.getElementById('diaryInput').value = ''; // Clear
+                loadDiary(); // Refresh list
+            })
+            .catch(err => alert("Failed to save thought: " + err.message));
+        }
+
+        function loadDiary() {
+            const container = document.getElementById('diaryContainer');
+            db.collection("diary_entries").orderBy("timestamp", "desc").limit(20).get()
+            .then((snapshot) => {
+                container.innerHTML = '';
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="text-gray-600 text-center text-sm">No thoughts recorded.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'Just now';
+                    const html = `
+                        <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm">
+                            <div class="text-xs text-blue-400 mb-1">${date}</div>
+                            <div class="text-gray-300 whitespace-pre-wrap">${data.content}</div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+            });
+        }
+
+        // --- TRADE LOGIC ---
 
         function saveTrade() {
             const habits = {
