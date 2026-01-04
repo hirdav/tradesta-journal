@@ -110,12 +110,31 @@
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
             <h2 class="text-xl font-bold mb-4 text-blue-400">📝 LOG THE TRADE</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input type="text" id="pair" placeholder="BTCUSD" class="bg-gray-700 text-white p-2 rounded uppercase">
-                <select id="direction" class="bg-gray-700 text-white p-2 rounded"><option value="Buy">BUY</option><option value="Sell">SELL</option></select>
-                <input type="number" step="any" id="entryPrice" placeholder="Entry Price" class="bg-gray-700 text-white p-2 rounded">
-                <input type="number" step="any" id="pnl" placeholder="P&L ($)" class="bg-gray-700 text-white p-2 rounded">
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Pair</label>
+                    <input type="text" id="pair" placeholder="BTCUSD" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 uppercase focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Direction</label>
+                    <select id="direction" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500">
+                        <option value="Long">BUY (Long)</option>
+                        <option value="Short">SELL (Short)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Entry Price ($)</label>
+                    <input type="number" step="any" id="entryPrice" placeholder="Entry Price" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-400 mb-1">Exit Price ($)</label>
+                    <input type="number" step="any" id="exitPrice" placeholder="Exit Price" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-gray-400 mb-1">Outcome P&L ($)</label>
+                    <input type="number" step="any" id="pnl" placeholder="P&L ($)" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500">
+                </div>
             </div>
-            <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded mb-4" placeholder="Notes..."></textarea>
+            <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:outline-none focus:border-blue-500 mb-4" placeholder="Notes..."></textarea>
             <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded">COMMIT</button>
         </div>
 
@@ -360,6 +379,7 @@
                 pair: document.getElementById('pair').value.toUpperCase(),
                 direction: document.getElementById('direction').value,
                 entryPrice: parseFloat(document.getElementById('entryPrice').value),
+                exitPrice: parseFloat(document.getElementById('exitPrice').value) || 0, // NEW FIELD
                 pnl: parseFloat(document.getElementById('pnl').value) || 0,
                 notes: document.getElementById('notes').value,
                 habits: habits,
@@ -368,8 +388,11 @@
             if (!tradeData.pair || !tradeData.entryPrice) { alert("Fill in Pair and Price."); return; }
 
             db.collection("trades").add(tradeData).then(() => {
-                document.getElementById('pair').value = ''; document.getElementById('entryPrice').value = '';
-                document.getElementById('pnl').value = ''; document.getElementById('notes').value = '';
+                document.getElementById('pair').value = ''; 
+                document.getElementById('entryPrice').value = '';
+                document.getElementById('exitPrice').value = ''; // Reset exit price
+                document.getElementById('pnl').value = ''; 
+                document.getElementById('notes').value = '';
                 document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
                 alert("Trade Logged."); loadTrades();
             }).catch(e => alert(e.message));
@@ -388,16 +411,20 @@
                     const pnlClass = data.pnl > 0 ? 'text-green-400' : (data.pnl < 0 ? 'text-red-400' : 'text-gray-400');
                     const pnlSign = data.pnl > 0 ? '+' : '';
                     
-                    const isBuy = data.direction === 'Buy';
-                    const dirColor = isBuy ? 'text-green-400' : 'text-red-400';
-                    const dirBg = isBuy ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800';
-                    const dirArrow = isBuy ? '↑' : '↓';
-                    const dirText = isBuy ? 'BUY' : 'SELL';
+                    // Logic Change: Display BUY or SELL based on Long/Short
+                    const isLong = data.direction === 'Long';
+                    const dirColor = isLong ? 'text-green-400' : 'text-red-400';
+                    const dirBg = isLong ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800';
+                    const dirArrow = isLong ? '↑' : '↓';
+                    const dirText = isLong ? 'BUY' : 'SELL'; // CHANGED TEXT
 
                     const allHabits = data.habits && data.habits.limitOrder && data.habits.stopLoss && data.habits.riskMgmt && data.habits.calmState;
                     const badge = allHabits 
                         ? '<span class="text-[10px] bg-green-900/50 text-green-300 px-1.5 py-0.5 rounded border border-green-700/50 tracking-wider">DISCIPLINED</span>' 
                         : '<span class="text-[10px] bg-red-900/50 text-red-300 px-1.5 py-0.5 rounded border border-red-700/50 tracking-wider">UNDISCIPLINED</span>';
+
+                    // Formatting Exit Price
+                    const exitPriceDisplay = data.exitPrice ? `$${data.exitPrice}` : '<span class="text-gray-600">-</span>';
 
                     container.innerHTML += `
                         <div class="border-b border-gray-700 pb-4 mb-4 last:border-0 last:mb-0 last:pb-0 hover:bg-gray-800/50 transition p-3 rounded-lg">
@@ -410,14 +437,18 @@
                                 </div>
                                 <div class="text-xs text-gray-500">${date}</div>
                             </div>
-                            <div class="flex justify-between items-end bg-gray-900/50 p-2 rounded border border-gray-700/30">
+                            <div class="grid grid-cols-3 gap-2 bg-gray-900/50 p-2 rounded border border-gray-700/30">
                                 <div>
-                                    <div class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Entry Price</div>
-                                    <div class="font-mono text-white text-lg">$${data.entryPrice}</div>
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-wide mb-0.5">Entry</div>
+                                    <div class="font-mono text-white text-sm md:text-base">$${data.entryPrice}</div>
+                                </div>
+                                <div class="text-center border-l border-r border-gray-800">
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-wide mb-0.5">Exit</div>
+                                    <div class="font-mono text-white text-sm md:text-base">${exitPriceDisplay}</div>
                                 </div>
                                 <div class="text-right">
-                                    <div class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">Outcome</div>
-                                    <div class="font-bold font-mono text-xl ${pnlClass}">${pnlSign}$${data.pnl}</div>
+                                    <div class="text-[10px] text-gray-500 uppercase tracking-wide mb-0.5">P&L</div>
+                                    <div class="font-bold font-mono text-sm md:text-base ${pnlClass}">${pnlSign}$${data.pnl}</div>
                                 </div>
                             </div>
                             <div class="mt-3 flex justify-between items-start gap-4">
@@ -435,5 +466,3 @@
     </script>
 </body>
 </html>
-
-
