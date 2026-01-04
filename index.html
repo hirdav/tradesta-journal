@@ -388,11 +388,11 @@
                     const pnlClass = data.pnl > 0 ? 'text-green-400' : (data.pnl < 0 ? 'text-red-400' : 'text-gray-400');
                     const pnlSign = data.pnl > 0 ? '+' : '';
                     
-                    const isLong = data.direction === 'Long';
-                    const dirColor = isLong ? 'text-green-400' : 'text-red-400';
-                    const dirBg = isLong ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800';
-                    const dirArrow = isLong ? '↑' : '↓';
-                    const dirText = isLong ? 'LONG' : 'SHORT';
+                    const isBuy = data.direction === 'Buy';
+                    const dirColor = isBuy ? 'text-green-400' : 'text-red-400';
+                    const dirBg = isBuy ? 'bg-green-900/20 border-green-800' : 'bg-red-900/20 border-red-800';
+                    const dirArrow = isBuy ? '↑' : '↓';
+                    const dirText = isBuy ? 'BUY' : 'SELL';
 
                     const allHabits = data.habits && data.habits.limitOrder && data.habits.stopLoss && data.habits.riskMgmt && data.habits.calmState;
                     const badge = allHabits 
@@ -435,4 +435,5 @@
     </script>
 </body>
 </html>
+
 
