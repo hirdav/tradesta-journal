@@ -17,7 +17,6 @@
         <div class="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700 w-full max-w-md">
             <h1 class="text-3xl font-bold text-center text-green-500 mb-6 tracking-widest">TRADESTA</h1>
             <p class="text-center text-gray-400 mb-6 text-sm">SECURE ACCESS REQUIRED</p>
-            
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm text-gray-500 mb-1">OPERATOR ID</label>
@@ -27,12 +26,8 @@
                     <label class="block text-sm text-gray-500 mb-1">PASSWORD</label>
                     <input type="password" id="loginPass" class="w-full bg-gray-900 text-white p-3 rounded border border-gray-600 focus:border-green-500 focus:outline-none" placeholder="Enter Password">
                 </div>
-                
                 <p id="loginError" class="text-red-500 text-xs text-center h-4"></p>
-
-                <button type="submit" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded transition duration-200">
-                    AUTHENTICATE
-                </button>
+                <button type="submit" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded transition duration-200">AUTHENTICATE</button>
             </form>
         </div>
     </div>
@@ -44,40 +39,12 @@
                     <h2 class="text-2xl md:text-3xl font-bold text-red-500 tracking-widest uppercase">The Arena Manifesto</h2>
                     <button onclick="toggleManifesto()" class="text-gray-500 hover:text-white text-2xl font-bold">&times;</button>
                 </div>
-                
                 <div class="space-y-6 text-gray-300 leading-relaxed">
-                    <p class="italic text-lg text-white border-l-4 border-red-500 pl-4">
-                        "I enter this market not to gamble, but to hunt. The market is a machine designed to transfer money from the impatient to the patient. Today, I choose to be the patient."
-                    </p>
-                    <div>
-                        <h3 class="text-yellow-500 font-bold text-lg mb-1">1. MY AMMO IS SCARCE ($100)</h3>
-                        <p>I do not have infinite lives. I have <strong>two bullets ($50 each)</strong>. If I fire blindly, I die. I will not spray and pray. I will wait for the perfect shot. Cash is a position.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-yellow-500 font-bold text-lg mb-1">2. MY WEAPON IS DANGEROUS (50x Leverage)</h3>
-                        <p>This leverage can build my empire or sever my hand. I respect it. I acknowledge that a <strong>1.5% move against me is death</strong>. I will never enter a trade without knowing exactly where I will die (Stop Loss).</p>
-                    </div>
-                    <div>
-                        <h3 class="text-yellow-500 font-bold text-lg mb-1">3. MY ENEMY IS THE FEE</h3>
-                        <p>The exchange wants me to churn. I will not feed the beast. <strong>I WILL NOT PAY FOR LIQUIDITY.</strong> I use Limit Orders only. If price leaves without me, let it go. Chasing is for losers.</p>
-                    </div>
-                    <div>
-                        <h3 class="text-yellow-500 font-bold text-lg mb-1">4. MY TRIGGER IS DISCIPLINE</h3>
-                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-400">
-                            <li><strong>No FOMO:</strong> I don't care about green candles, only my plan.</li>
-                            <li><strong>No Revenge:</strong> If I lose, I walk away for 10 mins.</li>
-                            <li><strong>One Shot:</strong> 1-2 high quality trades > 10 mediocre ones.</li>
-                        </ul>
-                    </div>
-                    <div class="bg-red-900/20 p-4 rounded border border-red-900/50">
-                        <h3 class="text-red-500 font-bold text-lg mb-2">5. THE PLEDGE</h3>
-                        <p class="text-sm font-semibold">
-                            If I catch myself entering a Market Order... I will close the terminal.<br>
-                            If I catch myself moving a Stop Loss... I will close the terminal.<br>
-                            If I catch myself trading out of boredom... I will close the terminal.
-                        </p>
-                        <p class="mt-4 text-center font-bold text-white tracking-widest">LET THE GAMES BEGIN.</p>
-                    </div>
+                    <p class="italic text-lg text-white border-l-4 border-red-500 pl-4">"I enter this market not to gamble, but to hunt..."</p>
+                    <div><h3 class="text-yellow-500 font-bold text-lg mb-1">1. MY AMMO IS SCARCE</h3><p>Two bullets. $50 each. No spray and pray.</p></div>
+                    <div><h3 class="text-yellow-500 font-bold text-lg mb-1">2. MY WEAPON IS DANGEROUS</h3><p>50x leverage. Stop loss or die.</p></div>
+                    <div><h3 class="text-yellow-500 font-bold text-lg mb-1">3. MY ENEMY IS THE FEE</h3><p>Limit Orders ONLY.</p></div>
+                    <div class="bg-red-900/20 p-4 rounded border border-red-900/50"><h3 class="text-red-500 font-bold text-lg mb-2">5. THE PLEDGE</h3><p class="text-sm font-semibold">Market Order = Close Terminal.<br>Move Stop Loss = Close Terminal.<br>Boredom Trade = Close Terminal.</p></div>
                 </div>
             </div>
         </div>
@@ -92,10 +59,16 @@
                 </div>
                 
                 <div class="mb-4">
-                    <textarea id="diaryInput" rows="4" class="w-full bg-gray-800 text-white p-4 rounded border border-gray-700 focus:border-blue-500 focus:outline-none placeholder-gray-500" placeholder="Empty your mind. What are you thinking? What are you feeling? Write it down to let it go."></textarea>
-                    <button onclick="saveDiary()" class="mt-2 w-full bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
-                        SAVE THOUGHT
-                    </button>
+                    <textarea id="diaryInput" rows="4" class="w-full bg-gray-800 text-white p-4 rounded border border-gray-700 focus:border-blue-500 focus:outline-none placeholder-gray-500" placeholder="Empty your mind..."></textarea>
+                    
+                    <div class="flex gap-2 mt-2">
+                        <button id="saveDiaryBtn" onclick="saveDiary()" class="flex-1 bg-blue-700 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
+                            SAVE THOUGHT
+                        </button>
+                        <button id="cancelEditBtn" onclick="cancelEdit()" class="hidden bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition">
+                            CANCEL
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex-grow overflow-y-auto pr-2">
@@ -109,82 +82,43 @@
     </div>
 
     <div id="appContent" class="hidden container mx-auto p-4 max-w-3xl">
-        
         <header class="mb-8 flex flex-col md:flex-row justify-between items-center border-b border-gray-700 pb-4 gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-green-500 tracking-wider">TRADESTA</h1>
                 <p class="text-sm text-gray-400 mt-1">"I do not donate my edge to the exchange."</p>
             </div>
             <div class="flex gap-3">
-                <button onclick="toggleDiary()" class="bg-blue-900/30 hover:bg-blue-800 text-blue-300 border border-blue-800 px-4 py-2 rounded text-sm font-bold transition flex items-center gap-2">
-                    🧠 Diary
-                </button>
-                <button onclick="toggleManifesto()" class="bg-red-900/30 hover:bg-red-800 text-red-300 border border-red-800 px-4 py-2 rounded text-sm font-bold animate-pulse transition">
-                    ⚠️ ReadMEEE
-                </button>
-                <button onclick="handleLogout()" class="text-xs text-gray-400 border border-gray-700 p-2 rounded hover:bg-gray-800 transition">
-                    LOGOUT
-                </button>
+                <button onclick="toggleDiary()" class="bg-blue-900/30 hover:bg-blue-800 text-blue-300 border border-blue-800 px-4 py-2 rounded text-sm font-bold transition">🧠 Diary</button>
+                <button onclick="toggleManifesto()" class="bg-red-900/30 hover:bg-red-800 text-red-300 border border-red-800 px-4 py-2 rounded text-sm font-bold animate-pulse transition">⚠️ ReadMEEE</button>
+                <button onclick="handleLogout()" class="text-xs text-gray-400 border border-gray-700 p-2 rounded hover:bg-gray-800 transition">LOGOUT</button>
             </div>
         </header>
 
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
             <h2 class="text-xl font-bold mb-4 text-yellow-400">⚠️ PRE-FIRE CHECKLIST</h2>
             <div id="checklistForm" class="space-y-3">
-                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
-                    <input type="checkbox" id="habit1" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
-                    <span>I am using a <strong>LIMIT ORDER</strong> (Maker).</span>
-                </label>
-                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
-                    <input type="checkbox" id="habit2" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
-                    <span>My Stop Loss is defined & set <strong>IMMEDIATELY</strong>.</span>
-                </label>
-                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
-                    <input type="checkbox" id="habit3" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
-                    <span>I am risking < 2% of my account (The 2-Bullet Rule).</span>
-                </label>
-                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition">
-                    <input type="checkbox" id="habit4" class="w-5 h-5 text-green-500 rounded focus:ring-green-500 bg-gray-700 border-gray-600">
-                    <span>I am calm (Not chasing / Not revenge trading).</span>
-                </label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition"><input type="checkbox" id="habit1" class="w-5 h-5 text-green-500 bg-gray-700 border-gray-600"><span>Limit Order (Maker)</span></label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition"><input type="checkbox" id="habit2" class="w-5 h-5 text-green-500 bg-gray-700 border-gray-600"><span>Stop Loss Set</span></label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition"><input type="checkbox" id="habit3" class="w-5 h-5 text-green-500 bg-gray-700 border-gray-600"><span>Risk < 2%</span></label>
+                <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-700 p-2 rounded transition"><input type="checkbox" id="habit4" class="w-5 h-5 text-green-500 bg-gray-700 border-gray-600"><span>Calm State</span></label>
             </div>
         </div>
 
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
             <h2 class="text-xl font-bold mb-4 text-blue-400">📝 LOG THE TRADE</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Pair</label>
-                    <input type="text" id="pair" placeholder="e.g. BTCUSD" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 uppercase">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Direction</label>
-                    <select id="direction" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
-                        <option value="Long">LONG (Buy)</option>
-                        <option value="Short">SHORT (Sell)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Entry Price ($)</label>
-                    <input type="number" step="any" id="entryPrice" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
-                </div>
-                <div>
-                    <label class="block text-sm text-gray-400 mb-1">Outcome P&L ($)</label>
-                    <input type="number" step="any" id="pnl" placeholder="Leave empty if open" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600">
-                </div>
+                <input type="text" id="pair" placeholder="BTCUSD" class="bg-gray-700 text-white p-2 rounded uppercase">
+                <select id="direction" class="bg-gray-700 text-white p-2 rounded"><option value="Long">LONG</option><option value="Short">SHORT</option></select>
+                <input type="number" step="any" id="entryPrice" placeholder="Entry Price" class="bg-gray-700 text-white p-2 rounded">
+                <input type="number" step="any" id="pnl" placeholder="P&L ($)" class="bg-gray-700 text-white p-2 rounded">
             </div>
-            <div class="mb-4">
-                <label class="block text-sm text-gray-400 mb-1">Notes</label>
-                <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600" placeholder="Strategy details..."></textarea>
-            </div>
-            <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded transition transform hover:scale-[1.01]">COMMIT</button>
+            <textarea id="notes" rows="3" class="w-full bg-gray-700 text-white p-2 rounded mb-4" placeholder="Notes..."></textarea>
+            <button onclick="saveTrade()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded">COMMIT</button>
         </div>
 
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
             <h2 class="text-xl font-bold mb-4 text-gray-300">📚 HISTORY</h2>
-            <div id="logContainer" class="space-y-4">
-                <p class="text-gray-500 text-center">Waiting for data...</p>
-            </div>
+            <div id="logContainer" class="space-y-4"><p class="text-gray-500 text-center">Waiting...</p></div>
         </div>
     </div>
 
@@ -203,22 +137,20 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+        let diaryCache = {}; // Local cache to store diary data for editing
+        let editingDiaryId = null; // Track which ID is being edited
 
-        // --- AUTH & UI LOGIC ---
-
-        function toggleManifesto() {
-            const modal = document.getElementById('manifestoModal');
-            modal.classList.toggle('hidden');
+        // --- AUTH ---
+        function handleLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById('loginId').value;
+            const pass = document.getElementById('loginPass').value;
+            if (id === "D_8op!%") {
+                auth.signInWithEmailAndPassword("admin@tradesta.com", pass)
+                    .catch(err => document.getElementById('loginError').innerText = "ACCESS DENIED");
+            } else { document.getElementById('loginError').innerText = "INVALID OPERATOR ID"; }
         }
-
-        function toggleDiary() {
-            const modal = document.getElementById('diaryModal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden')) {
-                loadDiary(); // Load thoughts when opened
-                document.getElementById('diaryInput').focus();
-            }
-        }
+        function handleLogout() { auth.signOut(); }
         
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -231,41 +163,76 @@
             }
         });
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const id = document.getElementById('loginId').value;
-            const pass = document.getElementById('loginPass').value;
-            const errorText = document.getElementById('loginError');
-
-            if (id === "D_8op!%") {
-                const email = "admin@tradesta.com"; 
-                auth.signInWithEmailAndPassword(email, pass)
-                    .then(() => errorText.innerText = "")
-                    .catch((error) => errorText.innerText = "ACCESS DENIED");
-            } else {
-                errorText.innerText = "INVALID OPERATOR ID";
+        // --- UI TOGGLES ---
+        function toggleManifesto() { document.getElementById('manifestoModal').classList.toggle('hidden'); }
+        function toggleDiary() {
+            const modal = document.getElementById('diaryModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                loadDiary();
+                document.getElementById('diaryInput').focus();
             }
         }
 
-        function handleLogout() {
-            auth.signOut();
-        }
-
-        // --- DIARY LOGIC ---
+        // --- DIARY LOGIC (ADD / EDIT) ---
         function saveDiary() {
             const content = document.getElementById('diaryInput').value;
             if (!content.trim()) return;
 
-            db.collection("diary_entries").add({
-                content: content,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                uid: auth.currentUser.uid
-            })
-            .then(() => {
-                document.getElementById('diaryInput').value = ''; // Clear
-                loadDiary(); // Refresh list
-            })
-            .catch(err => alert("Failed to save thought: " + err.message));
+            const btn = document.getElementById('saveDiaryBtn');
+            btn.innerText = "SAVING...";
+            btn.disabled = true;
+
+            if (editingDiaryId) {
+                // UPDATE EXISTING
+                db.collection("diary_entries").doc(editingDiaryId).update({
+                    content: content,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    resetDiaryForm();
+                    loadDiary();
+                }).catch(err => alert("Update failed: " + err.message));
+            } else {
+                // CREATE NEW
+                db.collection("diary_entries").add({
+                    content: content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    uid: auth.currentUser.uid
+                }).then(() => {
+                    resetDiaryForm();
+                    loadDiary();
+                }).catch(err => alert("Save failed: " + err.message));
+            }
+        }
+
+        function startEdit(id) {
+            const entry = diaryCache[id];
+            if (!entry) return;
+
+            editingDiaryId = id;
+            document.getElementById('diaryInput').value = entry.content;
+            document.getElementById('saveDiaryBtn').innerText = "UPDATE THOUGHT";
+            document.getElementById('saveDiaryBtn').classList.replace('bg-blue-700', 'bg-green-700');
+            document.getElementById('saveDiaryBtn').classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            document.getElementById('diaryInput').focus();
+        }
+
+        function cancelEdit() {
+            resetDiaryForm();
+        }
+
+        function resetDiaryForm() {
+            editingDiaryId = null;
+            document.getElementById('diaryInput').value = '';
+            
+            const btn = document.getElementById('saveDiaryBtn');
+            btn.innerText = "SAVE THOUGHT";
+            btn.disabled = false;
+            btn.classList.replace('bg-green-700', 'bg-blue-700');
+            btn.classList.replace('hover:bg-green-600', 'hover:bg-blue-600');
+            
+            document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
         function loadDiary() {
@@ -273,16 +240,26 @@
             db.collection("diary_entries").orderBy("timestamp", "desc").limit(20).get()
             .then((snapshot) => {
                 container.innerHTML = '';
+                diaryCache = {}; // Reset cache
+
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="text-gray-600 text-center text-sm">No thoughts recorded.</p>';
                     return;
                 }
+                
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    diaryCache[doc.id] = data; // Store for editing
                     const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'Just now';
+                    
                     const html = `
-                        <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm">
-                            <div class="text-xs text-blue-400 mb-1">${date}</div>
+                        <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm group relative">
+                            <div class="flex justify-between items-start mb-1">
+                                <div class="text-xs text-blue-400">${date}</div>
+                                <button onclick="startEdit('${doc.id}')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition">
+                                    ✏️ Edit
+                                </button>
+                            </div>
                             <div class="text-gray-300 whitespace-pre-wrap">${data.content}</div>
                         </div>
                     `;
@@ -291,8 +268,7 @@
             });
         }
 
-        // --- TRADE LOGIC ---
-
+        // --- TRADES LOGIC ---
         function saveTrade() {
             const habits = {
                 limitOrder: document.getElementById('habit1').checked,
@@ -300,12 +276,9 @@
                 riskMgmt: document.getElementById('habit3').checked,
                 calmState: document.getElementById('habit4').checked
             };
-
-            const pairInput = document.getElementById('pair').value.toUpperCase();
-            
             const tradeData = {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                pair: pairInput,
+                pair: document.getElementById('pair').value.toUpperCase(),
                 direction: document.getElementById('direction').value,
                 entryPrice: parseFloat(document.getElementById('entryPrice').value),
                 pnl: parseFloat(document.getElementById('pnl').value) || 0,
@@ -313,66 +286,38 @@
                 habits: habits,
                 uid: auth.currentUser.uid 
             };
+            if (!tradeData.pair || !tradeData.entryPrice) { alert("Fill in Pair and Price."); return; }
 
-            if (!tradeData.pair || !tradeData.entryPrice) {
-                alert("Fill in Pair and Price.");
-                return;
-            }
-
-            db.collection("trades").add(tradeData)
-            .then(() => {
-                document.getElementById('pair').value = '';
-                document.getElementById('entryPrice').value = '';
-                document.getElementById('pnl').value = '';
-                document.getElementById('notes').value = '';
+            db.collection("trades").add(tradeData).then(() => {
+                document.getElementById('pair').value = ''; document.getElementById('entryPrice').value = '';
+                document.getElementById('pnl').value = ''; document.getElementById('notes').value = '';
                 document.querySelectorAll('input[type=checkbox]').forEach(el => el.checked = false);
-                alert("Trade Logged Securely.");
-                loadTrades();
-            })
-            .catch((error) => alert("Write Failed: " + error.message));
+                alert("Trade Logged."); loadTrades();
+            }).catch(e => alert(e.message));
         }
 
         function loadTrades() {
             const container = document.getElementById('logContainer');
-            
-            db.collection("trades").orderBy("timestamp", "desc").limit(20).get().then((querySnapshot) => {
+            db.collection("trades").orderBy("timestamp", "desc").limit(20).get().then((snapshot) => {
                 container.innerHTML = '';
-                
-                if (querySnapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-500 text-center">No trades found.</p>';
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
+                if (snapshot.empty) { container.innerHTML = '<p class="text-gray-500 text-center">No trades found.</p>'; return; }
+                snapshot.forEach((doc) => {
                     const data = doc.data();
                     const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : '...';
                     const pnlClass = data.pnl > 0 ? 'text-green-400' : (data.pnl < 0 ? 'text-red-400' : 'text-gray-400');
-                    const allHabitsMet = data.habits && data.habits.limitOrder && data.habits.stopLoss && data.habits.riskMgmt && data.habits.calmState;
-                    const habitBadge = allHabitsMet 
-                        ? '<span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded border border-green-700">DISCIPLINED</span>'
-                        : '<span class="text-xs bg-red-900 text-red-300 px-2 py-1 rounded border border-red-700">UNDISCIPLINED</span>';
-
-                    const html = `
+                    const allHabits = data.habits && data.habits.limitOrder && data.habits.stopLoss && data.habits.riskMgmt && data.habits.calmState;
+                    const badge = allHabits ? '<span class="text-xs bg-green-900 text-green-300 px-2 py-1 rounded border border-green-700">DISCIPLINED</span>' : '<span class="text-xs bg-red-900 text-red-300 px-2 py-1 rounded border border-red-700">UNDISCIPLINED</span>';
+                    
+                    container.innerHTML += `
                         <div class="border-b border-gray-700 pb-3 last:border-0 hover:bg-gray-800 transition p-2 rounded">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <span class="font-bold text-lg text-white">${data.pair}</span> 
-                                    <span class="text-sm text-gray-400 ml-2 font-semibold">${data.direction}</span>
-                                    <div class="text-xs text-gray-500 mt-1">${date}</div>
-                                </div>
-                                <div class="text-right">
-                                    <div class="font-bold text-xl ${pnlClass}">$${data.pnl}</div>
-                                    <div class="mt-2">${habitBadge}</div>
-                                </div>
+                                <div><span class="font-bold text-lg text-white">${data.pair}</span> <span class="text-sm text-gray-400 ml-2 font-semibold">${data.direction}</span><div class="text-xs text-gray-500 mt-1">${date}</div></div>
+                                <div class="text-right"><div class="font-bold text-xl ${pnlClass}">$${data.pnl}</div><div class="mt-2">${badge}</div></div>
                             </div>
-                            <div class="text-gray-400 text-sm mt-2 italic bg-gray-900 p-2 rounded border border-gray-800">
-                                "${data.notes || ''}"
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
+                            <div class="text-gray-400 text-sm mt-2 italic bg-gray-900 p-2 rounded border border-gray-800">"${data.notes || ''}"</div>
+                        </div>`;
                 });
-            }).catch(err => console.log("Read Error:", err));
+            });
         }
     </script>
 </body>
