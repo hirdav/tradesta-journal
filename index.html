@@ -137,8 +137,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        let diaryCache = {}; // Local cache to store diary data for editing
-        let editingDiaryId = null; // Track which ID is being edited
+        let diaryCache = {}; // Local cache
+        let editingDiaryId = null;
 
         // --- AUTH ---
         function handleLogin(e) {
@@ -174,7 +174,7 @@
             }
         }
 
-        // --- DIARY LOGIC (ADD / EDIT) ---
+        // --- DIARY LOGIC ---
         function saveDiary() {
             const content = document.getElementById('diaryInput').value;
             if (!content.trim()) return;
@@ -184,16 +184,19 @@
             btn.disabled = true;
 
             if (editingDiaryId) {
-                // UPDATE EXISTING
+                // UPDATE
                 db.collection("diary_entries").doc(editingDiaryId).update({
                     content: content,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
                     resetDiaryForm();
                     loadDiary();
-                }).catch(err => alert("Update failed: " + err.message));
+                }).catch(err => {
+                    alert("Error: " + err.message);
+                    resetDiaryForm();
+                });
             } else {
-                // CREATE NEW
+                // NEW
                 db.collection("diary_entries").add({
                     content: content,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -201,7 +204,10 @@
                 }).then(() => {
                     resetDiaryForm();
                     loadDiary();
-                }).catch(err => alert("Save failed: " + err.message));
+                }).catch(err => {
+                    alert("Error: " + err.message);
+                    resetDiaryForm();
+                });
             }
         }
 
@@ -211,16 +217,17 @@
 
             editingDiaryId = id;
             document.getElementById('diaryInput').value = entry.content;
-            document.getElementById('saveDiaryBtn').innerText = "UPDATE THOUGHT";
-            document.getElementById('saveDiaryBtn').classList.replace('bg-blue-700', 'bg-green-700');
-            document.getElementById('saveDiaryBtn').classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+            
+            const btn = document.getElementById('saveDiaryBtn');
+            btn.innerText = "UPDATE THOUGHT";
+            btn.classList.replace('bg-blue-700', 'bg-green-700');
+            btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
+            
             document.getElementById('cancelEditBtn').classList.remove('hidden');
             document.getElementById('diaryInput').focus();
         }
 
-        function cancelEdit() {
-            resetDiaryForm();
-        }
+        function cancelEdit() { resetDiaryForm(); }
 
         function resetDiaryForm() {
             editingDiaryId = null;
@@ -240,7 +247,7 @@
             db.collection("diary_entries").orderBy("timestamp", "desc").limit(20).get()
             .then((snapshot) => {
                 container.innerHTML = '';
-                diaryCache = {}; // Reset cache
+                diaryCache = {};
 
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="text-gray-600 text-center text-sm">No thoughts recorded.</p>';
@@ -249,14 +256,15 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    diaryCache[doc.id] = data; // Store for editing
+                    diaryCache[doc.id] = data; 
                     const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'Just now';
                     
+                    // FIXED: Removed opacity-0 so the button is always visible
                     const html = `
                         <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm group relative">
                             <div class="flex justify-between items-start mb-1">
                                 <div class="text-xs text-blue-400">${date}</div>
-                                <button onclick="startEdit('${doc.id}')" class="text-gray-500 hover:text-white opacity-0 group-hover:opacity-100 transition">
+                                <button onclick="startEdit('${doc.id}')" class="text-xs font-bold text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition">
                                     ✏️ Edit
                                 </button>
                             </div>
