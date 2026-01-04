@@ -71,12 +71,15 @@
                     </div>
                 </div>
 
-                <div class="flex-grow overflow-y-auto pr-2">
+                <div class="flex-grow overflow-y-auto pr-2 mb-2">
                     <h3 class="text-sm text-gray-500 mb-2 uppercase tracking-wide">Previous Thoughts</h3>
                     <div id="diaryContainer" class="space-y-3">
                         <p class="text-gray-600 text-center text-sm">Loading thoughts...</p>
                     </div>
                 </div>
+                
+                <div id="paginationControls" class="flex justify-center items-center gap-2 mt-2 pt-2 border-t border-gray-800 text-sm hidden">
+                    </div>
             </div>
         </div>
     </div>
@@ -137,8 +140,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        let diaryCache = {}; // Local cache
-        let editingDiaryId = null;
+        
+        // --- STATE VARIABLES ---
+        let diaryCache = {};        // Stores ID -> Data map for editing
+        let editingDiaryId = null;  // Current ID being edited
+        let allDiaryEntries = [];   // Array to hold all fetched entries for pagination
+        let currentDiaryPage = 1;   // Current page number
+        const DIARY_ITEMS_PER_PAGE = 3; // Pagination limit
 
         // --- AUTH ---
         function handleLogin(e) {
@@ -183,46 +191,35 @@
             btn.innerText = "SAVING...";
             btn.disabled = true;
 
-            if (editingDiaryId) {
-                // UPDATE
-                db.collection("diary_entries").doc(editingDiaryId).update({
+            const promise = editingDiaryId 
+                ? db.collection("diary_entries").doc(editingDiaryId).update({
                     content: content,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    resetDiaryForm();
-                    loadDiary();
-                }).catch(err => {
-                    alert("Error: " + err.message);
-                    resetDiaryForm();
-                });
-            } else {
-                // NEW
-                db.collection("diary_entries").add({
+                })
+                : db.collection("diary_entries").add({
                     content: content,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     uid: auth.currentUser.uid
-                }).then(() => {
-                    resetDiaryForm();
-                    loadDiary();
-                }).catch(err => {
-                    alert("Error: " + err.message);
-                    resetDiaryForm();
                 });
-            }
+
+            promise.then(() => {
+                resetDiaryForm();
+                loadDiary(); // Reloads data and resets to page 1
+            }).catch(err => {
+                alert("Error: " + err.message);
+                resetDiaryForm();
+            });
         }
 
         function startEdit(id) {
             const entry = diaryCache[id];
             if (!entry) return;
-
             editingDiaryId = id;
             document.getElementById('diaryInput').value = entry.content;
-            
             const btn = document.getElementById('saveDiaryBtn');
             btn.innerText = "UPDATE THOUGHT";
             btn.classList.replace('bg-blue-700', 'bg-green-700');
             btn.classList.replace('hover:bg-blue-600', 'hover:bg-green-600');
-            
             document.getElementById('cancelEditBtn').classList.remove('hidden');
             document.getElementById('diaryInput').focus();
         }
@@ -232,48 +229,138 @@
         function resetDiaryForm() {
             editingDiaryId = null;
             document.getElementById('diaryInput').value = '';
-            
             const btn = document.getElementById('saveDiaryBtn');
             btn.innerText = "SAVE THOUGHT";
             btn.disabled = false;
             btn.classList.replace('bg-green-700', 'bg-blue-700');
             btn.classList.replace('hover:bg-green-600', 'hover:bg-blue-600');
-            
             document.getElementById('cancelEditBtn').classList.add('hidden');
         }
 
+        // --- PAGINATION & LOADING ---
         function loadDiary() {
             const container = document.getElementById('diaryContainer');
-            db.collection("diary_entries").orderBy("timestamp", "desc").limit(20).get()
+            // Fetch more items to make pagination useful (limit 50)
+            db.collection("diary_entries").orderBy("timestamp", "desc").limit(50).get()
             .then((snapshot) => {
-                container.innerHTML = '';
+                allDiaryEntries = [];
                 diaryCache = {};
 
                 if (snapshot.empty) {
                     container.innerHTML = '<p class="text-gray-600 text-center text-sm">No thoughts recorded.</p>';
+                    document.getElementById('paginationControls').classList.add('hidden');
                     return;
                 }
                 
+                // Store all data
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     diaryCache[doc.id] = data; 
-                    const date = data.timestamp ? data.timestamp.toDate().toLocaleString() : 'Just now';
-                    
-                    // FIXED: Removed opacity-0 so the button is always visible
-                    const html = `
-                        <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm group relative">
-                            <div class="flex justify-between items-start mb-1">
-                                <div class="text-xs text-blue-400">${date}</div>
-                                <button onclick="startEdit('${doc.id}')" class="text-xs font-bold text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition">
-                                    ✏️ Edit
-                                </button>
-                            </div>
-                            <div class="text-gray-300 whitespace-pre-wrap">${data.content}</div>
-                        </div>
-                    `;
-                    container.innerHTML += html;
+                    allDiaryEntries.push({ id: doc.id, ...data });
                 });
+
+                // Reset to page 1 on fresh load
+                currentDiaryPage = 1;
+                renderDiaryPage();
             });
+        }
+
+        function renderDiaryPage() {
+            const container = document.getElementById('diaryContainer');
+            container.innerHTML = '';
+
+            // Calculate Slice
+            const startIndex = (currentDiaryPage - 1) * DIARY_ITEMS_PER_PAGE;
+            const endIndex = startIndex + DIARY_ITEMS_PER_PAGE;
+            const pageItems = allDiaryEntries.slice(startIndex, endIndex);
+
+            // Render Items
+            pageItems.forEach(item => {
+                const date = item.timestamp ? item.timestamp.toDate().toLocaleString() : 'Just now';
+                const html = `
+                    <div class="bg-gray-800 p-3 rounded border border-gray-700 text-sm group relative animate-fade-in">
+                        <div class="flex justify-between items-start mb-1">
+                            <div class="text-xs text-blue-400">${date}</div>
+                            <button onclick="startEdit('${item.id}')" class="text-xs font-bold text-gray-400 hover:text-white bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded transition">
+                                ✏️ Edit
+                            </button>
+                        </div>
+                        <div class="text-gray-300 whitespace-pre-wrap">${item.content}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+
+            renderPaginationControls();
+        }
+
+        function renderPaginationControls() {
+            const controls = document.getElementById('paginationControls');
+            const totalPages = Math.ceil(allDiaryEntries.length / DIARY_ITEMS_PER_PAGE);
+
+            // Hide controls if 1 page or less
+            if (totalPages <= 1) {
+                controls.classList.add('hidden');
+                return;
+            }
+
+            controls.classList.remove('hidden');
+            let html = '';
+
+            // PREV Button
+            if (currentDiaryPage > 1) {
+                html += `<button onclick="changePage(${currentDiaryPage - 1})" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs">Prev</button>`;
+            } else {
+                html += `<button class="px-2 py-1 bg-gray-900 text-gray-600 rounded text-xs cursor-not-allowed">Prev</button>`;
+            }
+
+            // SMART PAGINATION LOGIC: 1 ... 4 5 6 ... 10
+            const range = [];
+            const delta = 1; // Number of pages to show around current page
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (
+                    i === 1 || 
+                    i === totalPages || 
+                    (i >= currentDiaryPage - delta && i <= currentDiaryPage + delta)
+                ) {
+                    range.push(i);
+                }
+            }
+
+            let lastItem = null;
+            range.forEach(i => {
+                if (lastItem) {
+                    if (i - lastItem === 2) {
+                        // If gap is exactly 1 number (e.g. 1, 3 -> missing 2), just show 2
+                        html += generatePageBtn(lastItem + 1, false);
+                    } else if (i - lastItem > 1) {
+                        // If gap is larger, show dots
+                        html += `<span class="px-2 text-gray-600">...</span>`;
+                    }
+                }
+                html += generatePageBtn(i, i === currentDiaryPage);
+                lastItem = i;
+            });
+
+            // NEXT Button
+            if (currentDiaryPage < totalPages) {
+                html += `<button onclick="changePage(${currentDiaryPage + 1})" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs">Next</button>`;
+            } else {
+                html += `<button class="px-2 py-1 bg-gray-900 text-gray-600 rounded text-xs cursor-not-allowed">Next</button>`;
+            }
+
+            controls.innerHTML = html;
+        }
+
+        function generatePageBtn(pageNum, isActive) {
+            const activeClass = isActive ? "bg-blue-700 text-white" : "bg-gray-800 hover:bg-gray-700 text-gray-300";
+            return `<button onclick="changePage(${pageNum})" class="px-3 py-1 rounded text-xs mx-1 ${activeClass}">${pageNum}</button>`;
+        }
+
+        function changePage(pageNum) {
+            currentDiaryPage = pageNum;
+            renderDiaryPage();
         }
 
         // --- TRADES LOGIC ---
